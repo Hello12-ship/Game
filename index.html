@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running Man Collecting Coins</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: linear-gradient(to top, #87ceeb, #fff);
+    font-family: Arial, sans-serif;
+  }
+
+  #game {
+    width: 100vw;
+    height: 100vh;
+    background: #70c5ce;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #man {
+    position: absolute;
+    bottom: 50px;
+    left: 100px;
+    width: 50px;
+    height: 50px;
+    background: red;
+    border-radius: 10px;
+  }
+
+  #coin {
+    position: absolute;
+    bottom: 100px;
+    width: 30px;
+    height: 30px;
+    background: gold;
+    border-radius: 50%;
+  }
+
+  #score {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .ground {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background: #654321;
+  }
+</style>
+</head>
+<body>
+  <div id="game">
+    <div id="score">Score: 0</div>
+    <div id="man"></div>
+    <div id="coin"></div>
+    <div class="ground"></div>
+  </div>
+
+  <script>
+    const man = document.getElementById("man");
+    const coin = document.getElementById("coin");
+    const scoreDisplay = document.getElementById("score");
+    let score = 0;
+    let jumping = false;
+    let velocity = 0;
+    let gravity = 0.8;
+    let ground = 50;
+    let manY = ground;
+
+    // Random coin position
+    function placeCoin() {
+      const x = Math.random() * (window.innerWidth - 50);
+      const y = 50 + Math.random() * 200;
+      coin.style.left = x + "px";
+      coin.style.bottom = y + "px";
+    }
+
+    placeCoin();
+
+    // Jump when space is pressed
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && !jumping) {
+        jumping = true;
+        velocity = 15;
+      }
+    });
+
+    // Game loop
+    function update() {
+      // Gravity
+      if (jumping) {
+        manY += velocity;
+        velocity -= gravity;
+        if (manY <= ground) {
+          manY = ground;
+          jumping = false;
+        }
+      }
+
+      man.style.bottom = manY + "px";
+
+      // Coin collision
+      const manRect = man.getBoundingClientRect();
+      const coinRect = coin.getBoundingClientRect();
+
+      if (
+        manRect.left < coinRect.right &&
+        manRect.right > coinRect.left &&
+        manRect.bottom > coinRect.top &&
+        manRect.top < coinRect.bottom
+      ) {
+        score++;
+        scoreDisplay.textContent = "Score: " + score;
+        placeCoin();
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+</body>
+</html>
